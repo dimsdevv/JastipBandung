@@ -1,0 +1,27 @@
+# Environment and Credentials
+.env
+*.env.local
+config/env.php
+
+# PHP & Server Logs
+*.log
+error_log
+
+# Uploads directory contents (ignore user-uploaded files, preserve folder)
+/uploads/*
+!/uploads/.gitkeep
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Node modules (if Tailwind CLI is used locally)
+node_modules/
+package-lock.json
