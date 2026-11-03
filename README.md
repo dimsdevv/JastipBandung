@@ -25,3 +25,4 @@ Platform Jasa Titip (Jastip) produk kuliner & barang khas Bandung berbasis web, 
 ## 📂 Dokumentasi Proyek
 * [Blueprint Sistem & Spesifikasi Peran](file:///c:/xampp/htdocs/JastipBandung/BLUEPRINT_JASTIP_BANDUNG.md)
 * [SOP & Workflow Vibe Coding Git](file:///c:/xampp/htdocs/JastipBandung/VIBE_CODING_GIT_WORKFLOW.md)
+

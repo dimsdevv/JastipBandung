@@ -25,3 +25,4 @@ Desktop.ini
 # Node modules (if Tailwind CLI is used locally)
 node_modules/
 package-lock.json
+
