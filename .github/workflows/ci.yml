@@ -1,0 +1,91 @@
+name: JastipBandung CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-validate:
+    name: 🤖 Robot Penguji (PHP Lint & Integrity Check)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 1. Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: 🐘 2. Setup PHP Runtime
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_mysql, mbstring
+          coverage: none
+
+      - name: 🔍 3. PHP Syntax Linter (Cek Error Penulisan Kode)
+        run: |
+          echo "Memeriksa sintaks seluruh file PHP di repositori..."
+          ERRORS=0
+          while IFS= read -r -d '' file; do
+            OUTPUT=$(php -l "$file" 2>&1)
+            if [ $? -ne 0 ]; then
+              echo "❌ Syntax error di: $file"
+              echo "$OUTPUT"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find . -type f -name "*.php" -not -path "*/vendor/*" -not -path "*/node_modules/*" -print0)
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "❌ Ditemukan $ERRORS file dengan syntax error! PR tidak boleh dimerge."
+            exit 1
+          fi
+          echo "✅ Semua file PHP valid dan bebas dari syntax error!"
+
+      - name: 🗄️ 4. Validasi Keberadaan & Format Skema Database
+        run: |
+          if [ ! -f "database.sql" ]; then
+            echo "❌ File database.sql tidak ditemukan!"
+            exit 1
+          fi
+          LINE_COUNT=$(wc -l < database.sql)
+          if [ "$LINE_COUNT" -lt 10 ]; then
+            echo "❌ File database.sql tampak kosong atau rusak!"
+            exit 1
+          fi
+          echo "✅ database.sql valid ($LINE_COUNT baris)"
+
+      - name: 📚 5. Verifikasi Integritas Dokumen & Struktur Direktori
+        run: |
+          REQUIRED_FILES=(
+            "config/app.php"
+            "config/database.php"
+            "config/helpers.php"
+            "includes/header.php"
+            "includes/footer.php"
+            "includes/auth_guard.php"
+            "index.php"
+            "docs/PRD_JASTIP_BANDUNG.md"
+            "docs/SRS_JASTIP_BANDUNG.md"
+            "docs/UML_JASTIP_BANDUNG.md"
+          )
+
+          MISSING=0
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ File esensial hilang: $file"
+              MISSING=$((MISSING + 1))
+            else
+              echo "  [OK] $file"
+            fi
+          done
+
+          if [ $MISSING -gt 0 ]; then
+            echo "❌ Ditemukan $MISSING file esensial yang hilang!"
+            exit 1
+          fi
+          echo "✅ Seluruh struktur direktori dan dokumentasi lengkap!"
+
+      - name: 🟢 6. Laporan Kelulusan Otomatis
+        run: |
+          echo "🎉 Seluruh pengujian otomatis LOLOS!"
+          echo "Kode aman untuk di-merge ke branch main."
